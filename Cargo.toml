@@ -1,0 +1,10 @@
+[package]
+name = "nebula"
+version = "0.1.0"
+edition = "2021"
+
+# TODO: add `std` and `alloc` features (disabled by default)
+
+[dependencies]
+rustix = { version = "0.38.31", default-features = false, features = ["stdio", "termios"] } # [[ syscall interface ]]
+embedded-io = "0.6.1" # [[ read/write implmentations ]]
