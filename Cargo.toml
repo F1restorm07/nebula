@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rustix = { version = "0.38.31", default-features = false, features = ["stdio", "termios"] } # [[ syscall interface ]]
 embedded-io = "0.6.1" # [[ read/write implmentations ]]
+numtoa = "0.2.4"

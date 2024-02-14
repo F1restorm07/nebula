@@ -1,15 +1,11 @@
 #![no_std]
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+extern crate alloc;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub mod colors;
+pub mod attributes;
+
+#[macro_export]
+macro_rules! csi {
+    ($($e:expr),*) => { concat!("\x1b[", $($e),*) };
 }

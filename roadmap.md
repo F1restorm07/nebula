@@ -4,7 +4,8 @@
 ## Features
 
 ### Functional Interfaces
-- [ ] colors (mayre-export owo-colors library)
+- [X] colors
+- [X] attributes
 - [ ] cursor manipulation (movement, line erasing)
 - [ ] enter/exit alt screen
 - [ ] enter/exit raw mode
