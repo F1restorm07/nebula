@@ -114,6 +114,16 @@ pub fn xterm_bg(text: impl AsRef<str>, r: u8, g: u8, b: u8) -> String {
     let idx = (36*r)+(6*g)+b+16;
     [csi!("48;5;"), idx.numtoa_str(10, &mut idx_b), "m", text.as_ref(), csi!("0m")].concat()
 }
+pub fn gray_fg(text: impl AsRef<str>, shade: u8) -> String {
+    let mut idx_b = [0; 3];
+    let shade = 232+shade;
+    [csi!("38;5;"), shade.numtoa_str(10, &mut idx_b), "m", text.as_ref(), csi!("0m")].concat()
+}
+pub fn gray_bg(text: impl AsRef<str>, shade: u8) -> String {
+    let mut idx_b = [0; 3];
+    let shade = 232+shade;
+    [csi!("48;5;"), shade.numtoa_str(10, &mut idx_b), "m", text.as_ref(), csi!("0m")].concat()
+}
 
 pub fn truecolor_fg(text: impl AsRef<str>, r: u8, g: u8, b: u8) -> String {
     let (mut rb, mut gb, mut bb) = ([0; 3], [0; 3], [0; 3]);

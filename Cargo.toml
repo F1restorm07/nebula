@@ -9,3 +9,4 @@ edition = "2021"
 rustix = { version = "0.38.31", default-features = false, features = ["stdio", "termios"] } # [[ syscall interface ]]
 embedded-io = "0.6.1" # [[ read/write implmentations ]]
 numtoa = "0.2.4"
+spin = { version = "0.9.8", default-features = false, features = ["spin_mutex", "lock_api"]}

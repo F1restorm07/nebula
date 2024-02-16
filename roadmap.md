@@ -6,10 +6,10 @@
 ### Functional Interfaces
 - [X] colors
 - [X] attributes
-- [ ] cursor manipulation (movement, line erasing)
-- [ ] enter/exit alt screen
-- [ ] enter/exit raw mode
-- [ ] scrolling
+- [X] cursor manipulation (movement, line erasing)
+- [X] enter/exit alt screen
+- [X] enter/exit raw mode
+- [X] scrolling
 
 ### Streaming Interfaces
 - [ ] events (keys, modifiers, etc)
@@ -19,3 +19,9 @@
 - [ ] allocation-free
 - [ ] async event handling
     - single-threaded for no_std contexts
+
+## API
+- [ ] central error enum
+    - convert errors from other crates
+- [ ] unix + windows apis
+    - unix first, then windows
