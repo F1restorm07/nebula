@@ -8,6 +8,8 @@ pub mod cursor;
 pub mod screen;
 pub mod raw;
 pub mod event;
+pub mod input;
+pub mod error;
 
 #[macro_export]
 macro_rules! csi {
