@@ -27,11 +27,13 @@
         - [X] csi events
         - [X] mouse events
         - [X] key events
+        - [X] utf8 characters
+        - [ ] modifier keys (in control sequences)
         - [ ] extended CSI u sequence
         - [ ] keyboard + device enhancements
 - [ ] input
     - [ ] event filters
-    - [ ] event iterator
+    - [X] event iterator
 
 ## Goals
 - [ ] allocation-free
@@ -39,7 +41,7 @@
     - single-threaded for no_std contexts
 
 ## API
-- [ ] central error enum
+- [X] central error enum
     - convert errors from other crates
 - [ ] unix + windows apis
     - unix first, then windows
