@@ -1,32 +1,29 @@
+use embedded_io::Read;
 use crate::event::{ parse_event, Event };
 use crate::error::NebulaError;
 
-pub struct EventIterator<'e> {
-    buffer: &'e [u8],
-    offset: usize
+pub struct EventIterator<R: Read> {
+    source: R,
 }
 
-impl<'e> EventIterator<'e> {
-    pub fn new(buffer: &'e [u8]) -> Self { Self { buffer, offset: 0 } }
+impl<R: Read> EventIterator<R> {
+    pub fn new(source: impl Into<R>) -> Self { Self { source: source.into() } }
 }
 
-impl Iterator for EventIterator<'_> {
+impl<R: Read> Iterator for EventIterator<R> {
     type Item = Event;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.offset >= self.buffer.len() { return None; }
+        let source = &mut self.source;
 
         // this code feels stupid lmao XD
-        let mut inc = 1;
-        let mut item = &self.buffer[self.offset..(self.offset + inc)];
+        let mut item = alloc::vec![0; 2]; // ??: how large should the initial capacity be
+        source.read(&mut item).unwrap();
         loop {
-            match parse_event(item) {
-                Ok(ev) => {
-                    self.offset+=inc;
-                    return Some(ev);
-                }
+            match parse_event(&item[..]) {
+                Ok(ev) => return Some(ev),
                 Err(NebulaError::NeedMoreData(hint)) => {
-                    item = &self.buffer[self.offset..(self.offset + hint)];
-                    inc+=hint;
+                    item.extend((0..hint).map(|_| 0u8));
+                    source.read(&mut item).unwrap();
                     continue;
                 },
                 _ => return None,
