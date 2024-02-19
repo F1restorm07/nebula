@@ -43,7 +43,7 @@ pub fn parse_event(item: &[u8]) -> Result<Event> {
 
             match item[1] {
                 b'O' => {
-                    if item.len() == 2 { return Err(NebulaError::NeedMoreData); }
+                    if item.len() == 2 { return Err(NebulaError::NeedMoreData(1)); }
 
                     match item[2] {
                         b'A' => Ok(Event::Key(KeyEvent::Up)),
@@ -78,7 +78,7 @@ pub fn parse_event(item: &[u8]) -> Result<Event> {
 fn parse_csi(item: &[u8]) -> Result<Event> {
     assert!(item.starts_with(&[b'\x1b', b'[']));
 
-    if item.len() == 2 { return Err(NebulaError::NeedMoreData); }
+    if item.len() == 2 { return Err(NebulaError::NeedMoreData(1)); }
 
     match item[2] {
         b'[' => { unimplemented!(); } // ??: not sure what to do here
@@ -99,20 +99,20 @@ fn parse_csi(item: &[u8]) -> Result<Event> {
         b'<' => parse_xterm_mouse_event(item),
         b';' => parse_csi_modifier(item),
         b'?' => match item[item.len() - 1] {
-            _ => Err(NebulaError::NeedMoreData), // TODO: implement attribute and device enhancements (after everything else)
+            _ => Err(NebulaError::NeedMoreData(1)), // TODO: implement attribute and device enhancements (after everything else)
         },
         b'0'..=b'9' => {
             // TODO: implement bracketed paste later (after everything else)
-            if item.len() == 3 { Err(NebulaError::NeedMoreData) }
+            if item.len() == 3 { Err(NebulaError::NeedMoreData(1)) }
             else {
                 let last_byte = item[item.len() - 1];
-                if !(64..=126).contains(&last_byte) { Err(NebulaError::NeedMoreData) }
+                if !(64..=126).contains(&last_byte) { Err(NebulaError::NeedMoreData(1)) }
                 else {
                     match last_byte {
                         b'M' => parse_rxvt_mouse_event(item),
                         b'~' => Ok(Event::Key(parse_csi_special_keycode(item))),
                         b'u' => Ok(Event::Key(parse_unicode_keycode(item))),
-                        b'R' => Ok(Event::Mouse(parse_cursor_position(item))),
+                        b'R' => parse_cursor_position(item),
                         _ => parse_csi_modifier(item),
                     }
                 }
@@ -123,9 +123,8 @@ fn parse_csi(item: &[u8]) -> Result<Event> {
 }
  fn parse_x10_mouse_event(item: &[u8]) -> Result<Event> {
     // CSI M <mouse button> <x> <y>
-    assert!(item.starts_with(b"\x1b[m"));
-    if item.len() < 6 { return Err(NebulaError::NeedMoreData); }
-    // TODO: parse the mouse button byte
+    if item.len() < 6 { return Err(NebulaError::NeedMoreData(6 - item.len())); }
+
     let button = item[3].checked_sub(32).unwrap();
     let x = u16::from(item[4].saturating_sub(32)) - 1;
     let y = u16::from(item[5].saturating_sub(32)) - 1;
@@ -134,8 +133,7 @@ fn parse_csi(item: &[u8]) -> Result<Event> {
 }
 fn parse_xterm_mouse_event(item: &[u8]) -> Result<Event> {
     // CSI < <mouse button> ; <x> ; <y> (;) (M/m)
-    assert!(item.starts_with(b"\x1b[<"));
-    if !item.ends_with(&[b'm']) && !item.ends_with(&[b'M']) { panic!(); }
+    if item.len() < 8 { return Err(NebulaError::NeedMoreData(8 - item.len())); }
 
     let mut params = item[3..item.len() - 1].split(|&b| b == b';');
     let button = params.next().unwrap()[0];
@@ -146,6 +144,7 @@ fn parse_xterm_mouse_event(item: &[u8]) -> Result<Event> {
 }
 fn parse_rxvt_mouse_event(item: &[u8]) -> Result<Event> {
     // CSI <mouse button> ; <x> ; <y> M
+    if item.len() < 8 { return Err(NebulaError::NeedMoreData(8 - item.len())); }
 
     let mut params = item[3..item.len() - 1].split(|&b| b == b';');
     let button = params.next().unwrap()[0];
@@ -201,13 +200,14 @@ fn parse_unicode_keycode(item: &[u8]) -> KeyEvent {
         _ => KeyEvent::Char(unicode_keycode),
     }
 }
-fn parse_cursor_position(item: &[u8]) -> MouseEvent {
+fn parse_cursor_position(item: &[u8]) -> Result<Event> {
     // CSI <row> ; <col> R
+    if item.len() < 6 { return Err(NebulaError::NeedMoreData(6 - item.len())); }
 
     let mut params = item[2..item.len() - 1].split(|&b| b == b';');
     let (row, col) = (u16::from(params.next().unwrap()[0]) - 1, u16::from(params.next().unwrap()[0]) - 1);
 
-    MouseEvent::Position(row, col)
+    Ok(Event::Mouse(MouseEvent::Position(row, col)))
 }
 // TODO: figure out what modifier keycodes are and parse them
 fn parse_csi_modifier(_item: &[u8]) -> Result<Event> {

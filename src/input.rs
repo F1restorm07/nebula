@@ -24,10 +24,9 @@ impl Iterator for EventIterator<'_> {
                     self.offset+=inc;
                     return Some(ev);
                 }
-                Err(NebulaError::NeedMoreData) => {
-                    // add another byte to the item and try again
-                    item = &self.buffer[self.offset..=(self.offset + inc)];
-                    inc+=1;
+                Err(NebulaError::NeedMoreData(hint)) => {
+                    item = &self.buffer[self.offset..(self.offset + hint)];
+                    inc+=hint;
                     continue;
                 },
                 _ => return None,

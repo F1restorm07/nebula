@@ -1,5 +1,6 @@
 pub enum NebulaError {
-    NeedMoreData,
+    // the paramter is a hint to how many bytes are needed to produce the full event sequence
+    NeedMoreData(usize),
     UnknownSequence,
     OsError(rustix::io::Errno),
 }
