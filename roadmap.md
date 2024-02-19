@@ -9,7 +9,7 @@
 - [X] enter/exit raw mode
 - [X] scrolling
 - [X] events
-- [ ] input
+- [X] input
 
 ## Features
 

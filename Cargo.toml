@@ -2,11 +2,14 @@
 name = "nebula"
 version = "0.1.0"
 edition = "2021"
-
-# TODO: add `std` and `alloc` features (disabled by default)
+description = "a terminal manipulator library"
+keywords = ["tty", "color", "terminal", "tui"]
 
 [dependencies]
 rustix = { version = "0.38.31", default-features = false, features = ["stdio", "termios"] } # [[ syscall interface ]]
 embedded-io = "0.6.1" # [[ read/write implmentations ]]
-numtoa = "0.2.4"
-spin = { version = "0.9.8", default-features = false, features = ["spin_mutex", "lock_api"]}
+numtoa = "0.2.4" # [[ number to string conversion ]]
+spin = { version = "0.9.8", default-features = false, features = ["spin_mutex", "lock_api"]} # [[ synchronization primatives ]]
+
+[features]
+std = ["embedded-io/std"]

@@ -2,7 +2,7 @@ use alloc::string::String;
 use crate::csi;
 use numtoa::NumToA;
 
-// TODO: remove all allocations
+// TODO: remove all allocations (see if using write! into a big enough byte string works)
 
 pub fn black_fg(text: impl AsRef<str>) -> String {
     [csi!("30"), text.as_ref(), csi!("39m")].concat()

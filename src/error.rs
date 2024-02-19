@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum NebulaError {
     // the paramter is a hint to how many bytes are needed to produce the full event sequence
     NeedMoreData(usize),
