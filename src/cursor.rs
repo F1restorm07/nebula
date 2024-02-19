@@ -5,6 +5,7 @@ use numtoa::NumToA;
 pub fn goto_home() -> String {
     csi!("H").into()
 }
+/// position the cursor at a specific coordinate (one-based)
 pub fn goto(line: u16, col: u16) -> String {
     let (mut lb, mut cb) = ([0; 4], [0; 4]);
     let (line, col) = (line.numtoa_str(10, &mut lb), col.numtoa_str(10, &mut cb));
